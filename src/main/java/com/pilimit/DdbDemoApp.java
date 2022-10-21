@@ -8,23 +8,28 @@ import java.io.IOException;
 
 
 public class DdbDemoApp {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
 
         final String usage = "\n" +
                 "App creates Demo DynamoDB table with 10 WCU/RCU with Movies DB\n\n" +
                 "Usage:\n" +
-                "    <tableName> <filePath> <region>\n\n" +
+                "    create <tableName> <filePath> <region>\n" +
+                "    delete <tableName> <region>\n\n" +
                 "Where:\n" +
                 "    tableName - The DynamoDB table to create (for example, Music3).\n" +
                 "    filePath - Source JSON file \n" +
                 "    region - The AWS region for the DynamoDB table (for example, us-east-1)\n\n ";
 
-        if (args.length != 3) {
+
+        if (args.length >= 3) {
             System.err.println(usage);
             System.exit(1);
         }
 
+        /*
+        TODO: Table command to create/delete/ (possiblly) update table parameters
+         */
         String tableName = args[0];
         String filePath = args[1];
         String tableRegion = args[2];
@@ -32,12 +37,12 @@ public class DdbDemoApp {
         ProfileCredentialsProvider credentialsProvider = ProfileCredentialsProvider.create();
         Region region = Region.of(tableRegion);
 
-        DynamoDbClient client = DynamoDbClient.builder()
+        DynamoDbClient ddbClient = DynamoDbClient.builder()
                 .credentialsProvider(credentialsProvider)
                 .region(region)
                 .build();
 
-        if(DescribeTable.getTableInfo(client, tableName)) {
+/*        if(DescribeTable.getTableInfo(client, tableName)) {
             System.out.println("Table exists...\n");
             try {
                 LoadData.loadData(client, tableName, filePath);
@@ -55,8 +60,14 @@ public class DdbDemoApp {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }
+        }*/
 
-        client.close();
+        System.out.println("Createing new DynamoDB table " + tableName);
+        String result = CreateTable.createTable(ddbClient, tableName);
+        System.out.println(result);
+
+        LoadData.loadData(ddbClient, tableName, filePath);
+
+        ddbClient.close();
     }
 }

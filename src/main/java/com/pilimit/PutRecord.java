@@ -1,14 +1,15 @@
 package com.pilimit;
 
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
-import software.amazon.awssdk.thirdparty.jackson.core.JsonFactory;
-import software.amazon.awssdk.thirdparty.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonNode;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -19,10 +20,11 @@ public class PutRecord {
     private static final ObjectMapper mapper = new ObjectMapper();
     public static void putRecord(DynamoDbEnhancedClient enhancedClient, String tableName, String fileName) throws IOException {
         try {
+
+
             DynamoDbTable<Movies> mappedTable = enhancedClient.table(tableName, TableSchema.fromBean(Movies.class));
-            /*JsonParser parser = new JsonFactory().createParser(new File(fileName));
-            JsonNode rootNode = new ObjectMapper().readTree(parser); */
-            JsonNode rootNode = mapper.readTree(fileName);
+            JsonParser parser = new JsonFactory().createParser(new File(fileName));
+            com.fasterxml.jackson.databind.JsonNode rootNode = new ObjectMapper().readTree(parser);
             Iterator<JsonNode> iter = rootNode.iterator();
             ObjectNode currentNode;
 
